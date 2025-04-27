@@ -1,0 +1,99 @@
+<!--
+  Copyright (c) 2025 ogt11.com, llc
+-->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create Certificate</title>
+    <link href="https://unpkg.com/material-components-web@latest/dist/material-components-web.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://unpkg.com/material-components-web@latest/dist/material-components-web.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/node-forge/1.0.0/forge.min.js"></script>
+</head>
+<body>
+    <div class="container">
+        <h1>Create Your Certificate</h1>
+        <div id="status" class="status"></div>
+
+        <form id="certForm">
+            <!-- Hidden fields for pre-filled data -->
+            <input type="hidden" id="username" name="username">
+            <input type="hidden" id="email" name="email">
+            <input type="hidden" id="displayName" name="displayName">
+            <input type="hidden" id="validationToken" name="validationToken">
+
+            <!-- Only show user info if we have pre-filled data -->
+            <div id="userInfo" style="display: none;" class="user-info">
+                <p>Creating certificate for:</p>
+                <div class="info-field">
+                    <strong>Name:</strong> <span id="displayNameText"></span>
+                </div>
+                <div class="info-field">
+                    <strong>Email:</strong> <span id="emailText"></span>
+                </div>
+                <div class="info-field">
+                    <strong>Username:</strong> <span id="usernameText"></span>
+                </div>
+            </div>
+
+            <!-- Password field is always shown -->
+            <div class="mdc-text-field mdc-text-field--outlined" data-mdc-auto-init="MDCTextField">
+                <input type="password" id="password" class="mdc-text-field__input" required minlength="8">
+                <div class="mdc-notched-outline">
+                    <div class="mdc-notched-outline__leading"></div>
+                    <div class="mdc-notched-outline__notch">
+                        <label for="password" class="mdc-floating-label">PKCS#12 Password</label>
+                    </div>
+                    <div class="mdc-notched-outline__trailing"></div>
+                </div>
+            </div>
+            <div class="mdc-text-field-helper-line">
+                <div class="mdc-text-field-helper-text">Must be at least 8 characters</div>
+            </div>
+
+            <button type="submit" class="mdc-button mdc-button--raised">
+                <span class="mdc-button__label">Generate Certificate</span>
+            </button>
+        </form>
+    </div>
+
+    <script>
+        // Initialize Material Design Components
+        window.mdc.autoInit();
+
+        // Check for pre-filled data
+        document.addEventListener('DOMContentLoaded', function() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const userDataParam = urlParams.get('userData');
+            const validationToken = urlParams.get('validationToken');
+
+            if (userDataParam && validationToken) {
+                try {
+                    const userData = JSON.parse(decodeURIComponent(userDataParam));
+                    
+                    // Fill hidden fields
+                    document.getElementById('username').value = userData.username;
+                    document.getElementById('email').value = userData.email;
+                    document.getElementById('displayName').value = userData.displayName;
+                    document.getElementById('validationToken').value = validationToken;
+
+                    // Show user info
+                    document.getElementById('userInfo').style.display = 'block';
+                    document.getElementById('displayNameText').textContent = userData.displayName;
+                    document.getElementById('emailText').textContent = userData.email;
+                    document.getElementById('usernameText').textContent = userData.username;
+                } catch (error) {
+                    console.error('Error parsing user data:', error);
+                    window.location.href = '/'; // Redirect to home on error
+                }
+            } else {
+                // No pre-filled data, redirect to home
+                window.location.href = '/';
+            }
+        });
+    </script>
+    <script src="app.js"></script>
+</body>
+</html> 
